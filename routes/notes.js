@@ -34,7 +34,7 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  knex.select('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName')
+  knex.first('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName')
     .from('notes')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .where('notes.id', noteId)
@@ -67,22 +67,30 @@ router.post('/', (req, res, next) => {
     folder_id : folderId
   };
 
+  let noteId;
+
   knex.insert(newItem)
     .into('notes')
-    .returning(['id', 'title', 'content'])
-    .then((results) => {
-      const result = results[0];
+    .returning('id')
+    .then(([id]) => {
+      noteId = id;
+      // Using the new id, select the new note and the folder
+      return knex.select('notes.id', 'title', 'content', 'folder_id as folderId', 'folders.name as folderName')
+        .from('notes')
+        .leftJoin('folders', 'notes.folder_id', 'folders.id')
+        .where('notes.id', noteId);
+    })
+    .then(([result]) => {
       res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
-    .catch(err => {
-      next(err);
-    });
+    .catch(err => next(err));
+
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
   const noteId = req.params.id;
-  const { title, content } = req.body;
+  const { title, content, folderId } = req.body;
 
   /***** Never trust users. Validate input *****/
   if (!title) {
@@ -93,19 +101,23 @@ router.put('/:id', (req, res, next) => {
 
   const updateItem = {
     title: title,
-    content: content
+    content: content,
+    folder_id : folderId
   };
+
 
   knex('notes')
     .update(updateItem)
     .where('id', noteId)
-    .returning(['id', 'title', 'content'])
+    .returning('id')
+    .then(([id]) => {
+      return knex.select('notes.id', 'title', 'content', 'folder_id as folderId', 'folders.name as folderName')
+        .from('notes')
+        .leftJoin('folders', 'notes.folder_id', 'folders.id')
+        .where('notes.id', id);
+    })
     .then(([result]) => {
-      if (result) {
-        res.json(result);
-      } else {
-        next();
-      }
+      res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
     .catch(err => {
       next(err);
