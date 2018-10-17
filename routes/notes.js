@@ -117,7 +117,7 @@ router.put('/:id', (req, res, next) => {
         .where('notes.id', id);
     })
     .then(([result]) => {
-      res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
+      res.location(`${req.originalUrl}/${result.id}`).status(200).json(result);
     })
     .catch(err => {
       next(err);
