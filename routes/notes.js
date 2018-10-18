@@ -2,6 +2,7 @@
 
 const express = require('express');
 const knex = require('../knex');
+const hydrateNotes = require('../utils/hydrateNotes');
 
 const router = express.Router();
 
@@ -10,8 +11,10 @@ router.get('/', (req, res, next) => {
   const searchTerm = req.query.searchTerm;
   const folderId = req.query.folderId;
 
-  knex.select('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName')
+  knex.select('notes.id', 'notes.title', 'notes.content', 'folders.id as folderId', 'folders.name as folderName', 'notes_tags.tag_id as tagId', 'tags.name as tagName')
     .from('notes')
+    .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+    .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .modify(function (queryBuilder) {
       if (searchTerm) {
@@ -24,8 +27,13 @@ router.get('/', (req, res, next) => {
       }
     })
     .orderBy('notes.id')
-    .then(results => {
-      res.json(results);
+    .then(result => {
+      if (result) {
+        const hydrated = hydrateNotes(result);
+        res.json(hydrated);
+      } else {
+        next();
+      }
     })
     .catch(err => next(err));
 });
@@ -34,13 +42,16 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  knex.first('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName')
+  knex.select('notes.id', 'notes.title', 'notes.content', 'folders.id as folderId', 'folders.name as folderName', 'notes_tags.tag_id as tagId', 'tags.name as tagName')
     .from('notes')
+    .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+    .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .where('notes.id', noteId)
     .then(result => {
       if (result) {
-        res.json(result);
+        const hydrated = hydrateNotes(result);
+        res.json(hydrated);
       } else {
         next();
       }
