@@ -1,15 +1,12 @@
 -- psql -U dev -d noteful-app -f ./db/noteful.sql
+DROP TABLE IF EXISTS notes_tags;
+
+DROP TABLE IF EXISTS tags;
 
 DROP TABLE IF EXISTS notes;
 
 DROP TABLE IF EXISTS folders;
 
-DROP TABLE IF EXISTS tags;
-
-CREATE TABLE tags (
-  id serial PRIMARY KEY,
-  name text NOT NULL
-);
 
 CREATE TABLE folders (
   id serial PRIMARY KEY,
@@ -22,6 +19,11 @@ CREATE TABLE notes (
   content text,
   created timestamp DEFAULT now(),
   folder_id int REFERENCES folders(id) ON DELETE SET NULL
+);
+
+CREATE TABLE tags (
+  id serial PRIMARY KEY,
+  name text NOT NULL
 );
 
 CREATE TABLE notes_tags (
