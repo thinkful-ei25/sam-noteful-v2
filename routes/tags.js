@@ -35,7 +35,7 @@ router.get('/:id', (req,res,next)=>{
 
 
 // ========== POST/CREATE ITEM ========== 
-router.post('/tags', (req, res, next) => {
+router.post('/', (req, res, next) => {
   const { name } = req.body;
 
   /***** Never trust users. Validate input *****/
