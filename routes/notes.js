@@ -54,7 +54,7 @@ router.get('/:id', (req, res, next) => {
 router.post('/', (req, res, next) => {
   const { title, content, folderId } = req.body;
 
-  /***** Never trust users. Validate input *****/
+  /***** Validate Input *****/
   if (!title) {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
@@ -64,7 +64,7 @@ router.post('/', (req, res, next) => {
   const newItem = {
     title: title,
     content: content,
-    folder_id : folderId
+    folder_id : (folderId) ? folderId: null 
   };
 
   let noteId;
@@ -87,12 +87,13 @@ router.post('/', (req, res, next) => {
 
 });
 
-/* ========== PUT/UPDATE A SINGLE ITEM ========== */
+// ========== PUT/UPDATE A SINGLE ITEM ==========
+
 router.put('/:id', (req, res, next) => {
   const noteId = req.params.id;
   const { title, content, folderId } = req.body;
 
-  /***** Never trust users. Validate input *****/
+  /***** Validating Input *****/
   if (!title) {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
@@ -117,14 +118,15 @@ router.put('/:id', (req, res, next) => {
         .where('notes.id', id);
     })
     .then(([result]) => {
-      res.location(`${req.originalUrl}/${result.id}`).status(200).json(result);
+      res.location(`${req.originalUrl}/${result.id}`).status(200).jsn(result);
     })
     .catch(err => {
       next(err);
     });
 });
 
-/* ========== DELETE/REMOVE A SINGLE ITEM ========== */
+//========== DELETE/REMOVE A SINGLE ITEM ========== 
+
 router.delete('/:id', (req, res, next) => {
   knex.del()
     .where('id', req.params.id)

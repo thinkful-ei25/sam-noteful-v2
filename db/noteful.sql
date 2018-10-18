@@ -4,6 +4,13 @@ DROP TABLE IF EXISTS notes;
 
 DROP TABLE IF EXISTS folders;
 
+DROP TABLE IF EXISTS tags;
+
+CREATE TABLE tags (
+  id serial PRIMARY KEY,
+  name text NOT NULL
+);
+
 CREATE TABLE folders (
   id serial PRIMARY KEY,
   name text NOT NULL
@@ -17,9 +24,16 @@ CREATE TABLE notes (
   folder_id int REFERENCES folders(id) ON DELETE SET NULL
 );
 
+CREATE TABLE notes_tags (
+  note_id INTEGER NOT NULL REFERENCES notes ON DELETE CASCADE,
+  tag_id INTEGER NOT NULL REFERENCES tags ON DELETE CASCADE
+);
+
 ALTER SEQUENCE notes_id_seq RESTART WITH 1000;
 
 ALTER SEQUENCE folders_id_seq RESTART WITH 100;
+
+ALTER SEQUENCE tags_id_seq RESTART WITH 500;
 
 INSERT INTO folders (name) VALUES
   ('Archive'),
