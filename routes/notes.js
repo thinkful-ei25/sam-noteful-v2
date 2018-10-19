@@ -57,7 +57,8 @@ router.get('/:id', (req, res, next) => {
     .then(result => {
       if (result) {
         const hydrated = hydrateNotes(result);
-        res.json(hydrated);
+        //returning an object inside an array, so made it return the first and only object in the array
+        res.json(hydrated[0]);
       } else {
         next();
       }
