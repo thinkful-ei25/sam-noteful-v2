@@ -136,7 +136,7 @@ router.put('/:id', (req, res, next) => {
   const updateItem = {
     title: title,
     content: content,
-    folder_id : folderId
+    folder_id : (folderId) ? folderId : null
   };
 
   knex('notes') //update note in notes table
@@ -147,7 +147,7 @@ router.put('/:id', (req, res, next) => {
     })
     .then(()=>{
       //insert related tags into notes_tags table
-      const tagsInsert = tags.map(tagId =>({ note_id: noteId, tag_id :tagId}));
+      const tagsInsert = tags.map(tagId =>({ note_id: noteId, tag_id : tagId}));
       return knex.insert(tagsInsert).into('notes_tags');
     })
     .then(() => {
