@@ -48,7 +48,8 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   const noteId = req.params.id;
 
-  knex.select('notes.id', 'notes.title', 'notes.content', 'folders.id as folderId', 'folders.name as folderName', 'notes_tags.tag_id as tagId', 'tags.name as tagName')
+  knex.select('notes.id', 'notes.title', 'notes.content', 'folders.id as folderId', 'folders.name as folderName', 
+    'notes_tags.tag_id as tagId', 'tags.name as tagName')
     .from('notes')
     .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
     .leftJoin('tags', 'tags.id', 'notes_tags.tag_id')
@@ -161,9 +162,9 @@ router.put('/:id', (req, res, next) => {
     .then(result => {
       if (result) {
       // Hydrate the results
-        const hydrated = hydrateNotes(result)[0];
+        const hydrated = hydrateNotes(result);
         // Respond with a location header, a 201 status and a note object
-        res.location(`${req.originalUrl}/${hydrated.id}`).status(201).json(hydrated);
+        res.location(`${req.originalUrl}/${hydrated.id}`).status(201).json(hydrated[0]);
       } else {
         next();
       }
