@@ -14,7 +14,7 @@ const tagsRouter = require('./routes/tags');
 const app = express();
 
 // Log all requests
-if(process.env.MODE_ENV !== 'test'){
+if(process.env.NODE_ENV !== 'test'){
   app.use(morgan('dev'));
 }
 
