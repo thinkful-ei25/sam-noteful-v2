@@ -231,6 +231,7 @@ const noteful = (function () {
       event.preventDefault();
 
       const newFolderName = $('.js-new-folder-entry').val();
+      $('.js-new-folder-entry').val('');
 
       // console.info('Create a folder, coming soon...');
       api.create('/api/folders', { name: newFolderName })
