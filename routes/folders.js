@@ -100,15 +100,19 @@ router.put('/:id', (req, res, next)=>{
 //Delete folder by ID, accepts an ID and deletes the folder from the DB and then returns a status 204
 
 router.delete('/:id', (req, res, next)=>{
-  knex.delete()
-    .where('id', req.params.id)
-    .from('folders')
-    .then(()=>{
-      res.status(204).end();
-    })
-    .catch(err =>{
-      next(err);
-    });
+  const id = req.params.id || null;
+  if(id){
+    knex.delete()
+      .where('id', id)
+      .from('folders')
+      .then(()=>{
+        res.status(204).end();
+      })
+      .catch(err =>{
+        next(err);
+      });
+  }
+  return;
 });
 
 

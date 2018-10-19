@@ -1,2 +1,11 @@
 language: node_js
 node_js: node
+
+services:
+  -progresql
+
+env:
+    DATABASE_URL: postgres://postgres@localhost/noteful-test
+
+before-script:
+    - psql -c 'CREATE DATABASE "noteful-test";' -U postgres

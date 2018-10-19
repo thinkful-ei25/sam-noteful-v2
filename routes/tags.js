@@ -93,13 +93,17 @@ router.put('/:id', (req,res,next)=>{
 // ======= DELETE A SINGLE ITEM =========
 
 router.delete('/:id', (req, res, next)=>{
-  knex.delete()
-    .where('id', req.params.id)
-    .from('tags')
-    .then(()=>{
-      res.status(204).end();
-    })
-    .catch(err=>next(err));
+  const id = req.params.id || null;
+  if(id){
+    knex.delete()
+      .where('id', id)
+      .from('tags')
+      .then(()=>{
+        res.status(204).end();
+      })
+      .catch(err=>next(err));
+  }
+  return;
 });
 
 module.exports = router;
