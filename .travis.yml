@@ -2,7 +2,7 @@ language: node_js
 node_js: node
 
 services:
-  -postgresql
+  - postgresql
 
 env:
     TEST_DATABASE_URL: postgres://postgres@localhost/noteful-test
